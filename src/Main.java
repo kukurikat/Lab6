@@ -1,3 +1,7 @@
+import model.*;
+import repository.*;
+import service.*;
+import util.*;
 import java.util.*;
 
 interface ICommand {
@@ -5,13 +9,25 @@ interface ICommand {
     String getDescription();
 }
 
-// Команди для роботи з салатами
 class CreateSaladCommand implements ICommand {
+    private SaladService saladService;
+    private Scanner scanner;
 
+    public CreateSaladCommand(SaladService saladService, Scanner scanner) {
+        this.saladService = saladService;
+        this.scanner = scanner;
+    }
 
     @Override
     public void execute() {
-        System.out.println("\nРеалізувати createSalad()");
+        System.out.print("\nВведіть назву салату: ");
+        String name = scanner.nextLine();
+        System.out.print("Введіть ID салату: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        Salad salad = saladService.createSalad(name, id);
+        System.out.println("Салат '" + name + "' успішно створено!");
     }
 
     @Override
@@ -21,9 +37,41 @@ class CreateSaladCommand implements ICommand {
 }
 
 class AddVegetableToSaladCommand implements ICommand {
+    private SaladService saladService;
+    private VegetableRepository vegetableRepository;
+    private Scanner scanner;
+
+    public AddVegetableToSaladCommand(SaladService saladService, VegetableRepository vegetableRepository, Scanner scanner) {
+        this.saladService = saladService;
+        this.vegetableRepository = vegetableRepository;
+        this.scanner = scanner;
+    }
+
     @Override
     public void execute() {
-        System.out.println("\nРеалізувати addVegetableToSalad()");
+        System.out.print("\nВведіть ID салату: ");
+        int saladId = scanner.nextInt();
+        scanner.nextLine();
+
+        Salad salad = saladService.getSaladById(saladId);
+        if (salad == null) {
+            System.out.println("Салат не знайдено!");
+            return;
+        }
+
+        System.out.println("\nДоступні овочі:");
+        for (Vegetable veg : vegetableRepository.getAllVegetables()) {
+            System.out.println(veg);
+        }
+
+        System.out.print("\nВведіть ID овоча: ");
+        int vegId = scanner.nextInt();
+        System.out.print("Введіть вагу (г): ");
+        double weight = scanner.nextDouble();
+        scanner.nextLine();
+
+        saladService.addVegetableToSalad(salad, vegId, weight);
+        System.out.println("Овоч додано до салату!");
     }
 
     @Override
@@ -33,9 +81,34 @@ class AddVegetableToSaladCommand implements ICommand {
 }
 
 class RemoveVegetableFromSaladCommand implements ICommand {
+    private SaladService saladService;
+    private Scanner scanner;
+
+    public RemoveVegetableFromSaladCommand(SaladService saladService, Scanner scanner) {
+        this.saladService = saladService;
+        this.scanner = scanner;
+    }
+
     @Override
     public void execute() {
-        System.out.println("\nРеалізувати removeVegetableFromSalad()");
+        System.out.print("\nВведіть ID салату: ");
+        int saladId = scanner.nextInt();
+        scanner.nextLine();
+
+        Salad salad = saladService.getSaladById(saladId);
+        if (salad == null) {
+            System.out.println("Салат не знайдено!");
+            return;
+        }
+
+        saladService.displayAllVegetablesInSalad(salad);
+
+        System.out.print("\nВведіть номер овоча для видалення: ");
+        int index = scanner.nextInt() - 1;
+        scanner.nextLine();
+
+        saladService.removeVegetableFromSalad(salad, index);
+        System.out.println("Овоч видалено з салату!");
     }
 
     @Override
@@ -45,9 +118,22 @@ class RemoveVegetableFromSaladCommand implements ICommand {
 }
 
 class DisplaySaladCommand implements ICommand {
+    private SaladService saladService;
+    private Scanner scanner;
+
+    public DisplaySaladCommand(SaladService saladService, Scanner scanner) {
+        this.saladService = saladService;
+        this.scanner = scanner;
+    }
+
     @Override
     public void execute() {
-        System.out.println("\nРеалізувати displaySalad()");
+        System.out.print("\nВведіть ID салату: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        Salad salad = saladService.getSaladById(id);
+        saladService.displaySalad(salad);
     }
 
     @Override
@@ -57,10 +143,22 @@ class DisplaySaladCommand implements ICommand {
 }
 
 class DisplayAllVegetablesInSaladCommand implements ICommand {
+    private SaladService saladService;
+    private Scanner scanner;
+
+    public DisplayAllVegetablesInSaladCommand(SaladService saladService, Scanner scanner) {
+        this.saladService = saladService;
+        this.scanner = scanner;
+    }
 
     @Override
     public void execute() {
-        System.out.println("\nРеалізувати displayAllVegetablesInSalad()");
+        System.out.print("\nВведіть ID салату: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        Salad salad = saladService.getSaladById(id);
+        saladService.displayAllVegetablesInSalad(salad);
     }
 
     @Override
@@ -70,10 +168,27 @@ class DisplayAllVegetablesInSaladCommand implements ICommand {
 }
 
 class CalculateCaloriesCommand implements ICommand {
+    private SaladService saladService;
+    private Scanner scanner;
+
+    public CalculateCaloriesCommand(SaladService saladService, Scanner scanner) {
+        this.saladService = saladService;
+        this.scanner = scanner;
+    }
 
     @Override
     public void execute() {
-        System.out.println("\nРеалізувати calculateCalories()");
+        System.out.print("\nВведіть ID салату: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        Salad salad = saladService.getSaladById(id);
+        if (salad != null) {
+            double calories = saladService.calculateCalories(salad);
+            System.out.printf("Загальна калорійність салату: %.2f ккал\n", calories);
+        } else {
+            System.out.println("Салат не знайдено!");
+        }
     }
 
     @Override
@@ -83,10 +198,28 @@ class CalculateCaloriesCommand implements ICommand {
 }
 
 class SortVegetablesByCaloriesInSaladCommand implements ICommand {
+    private SaladService saladService;
+    private Scanner scanner;
+
+    public SortVegetablesByCaloriesInSaladCommand(SaladService saladService, Scanner scanner) {
+        this.saladService = saladService;
+        this.scanner = scanner;
+    }
 
     @Override
     public void execute() {
-        System.out.println("\nРеалізувати sortVegetablesByCaloriesInSalad()");
+        System.out.print("\nВведіть ID салату: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        Salad salad = saladService.getSaladById(id);
+        if (salad != null) {
+            saladService.sortSaladByCalories(salad, "asc");
+            System.out.println("Овочі відсортовано за калоріями!");
+            saladService.displayAllVegetablesInSalad(salad);
+        } else {
+            System.out.println("Салат не знайдено!");
+        }
     }
 
     @Override
@@ -96,11 +229,28 @@ class SortVegetablesByCaloriesInSaladCommand implements ICommand {
 }
 
 class SortVegetablesByWeightInSaladCommand implements ICommand {
+    private SaladService saladService;
+    private Scanner scanner;
 
+    public SortVegetablesByWeightInSaladCommand(SaladService saladService, Scanner scanner) {
+        this.saladService = saladService;
+        this.scanner = scanner;
+    }
 
     @Override
     public void execute() {
-        System.out.println("\nРеалізувати sortVegetablesByWeightInSalad()");
+        System.out.print("\nВведіть ID салату: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        Salad salad = saladService.getSaladById(id);
+        if (salad != null) {
+            saladService.sortSaladByWeight(salad);
+            System.out.println("Овочі відсортовано за вагою!");
+            saladService.displayAllVegetablesInSalad(salad);
+        } else {
+            System.out.println("Салат не знайдено!");
+        }
     }
 
     @Override
@@ -110,10 +260,22 @@ class SortVegetablesByWeightInSaladCommand implements ICommand {
 }
 
 class DeleteSaladCommand implements ICommand {
+    private SaladService saladService;
+    private Scanner scanner;
+
+    public DeleteSaladCommand(SaladService saladService, Scanner scanner) {
+        this.saladService = saladService;
+        this.scanner = scanner;
+    }
 
     @Override
     public void execute() {
-        System.out.println("\nРеалізувати deleteSalad()");
+        System.out.print("\nВведіть ID салату для видалення: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        saladService.deleteSalad(id);
+        System.out.println("Салат видалено!");
     }
 
     @Override
@@ -122,12 +284,19 @@ class DeleteSaladCommand implements ICommand {
     }
 }
 
-// Команди для роботи з овочами
 class DisplayAllVegetablesCommand implements ICommand {
+    private VegetableRepository vegetableRepository;
+
+    public DisplayAllVegetablesCommand(VegetableRepository vegetableRepository) {
+        this.vegetableRepository = vegetableRepository;
+    }
 
     @Override
     public void execute() {
-        System.out.println("\nРеалізувати displayAllVegetables()");
+        System.out.println("\n=== Всі доступні овочі ===");
+        for (Vegetable veg : vegetableRepository.getAllVegetables()) {
+            System.out.println(veg);
+        }
     }
 
     @Override
@@ -137,10 +306,39 @@ class DisplayAllVegetablesCommand implements ICommand {
 }
 
 class AddVegetableToRepositoryCommand implements ICommand {
+    private VegetableRepository vegetableRepository;
+    private Scanner scanner;
+
+    public AddVegetableToRepositoryCommand(VegetableRepository vegetableRepository, Scanner scanner) {
+        this.vegetableRepository = vegetableRepository;
+        this.scanner = scanner;
+    }
 
     @Override
     public void execute() {
-        System.out.println("\nРеалізувати addVegetableToRepository()");
+        System.out.print("\nВведіть ID овоча: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+        System.out.print("Введіть назву овоча: ");
+        String name = scanner.nextLine();
+        System.out.print("Введіть калорії на 100г: ");
+        double calories = scanner.nextDouble();
+        scanner.nextLine();
+        System.out.print("Виберіть тип (1-Плодовий, 2-Кореневий, 3-Листяний): ");
+        int type = scanner.nextInt();
+        scanner.nextLine();
+
+        Vegetable veg;
+        if (type == 1) {
+            veg = new FruitVegetable(id, name, 0, calories);
+        } else if (type == 2) {
+            veg = new RootVegetable(id, name, 0, calories);
+        } else {
+            veg = new LeafyVegetable(id, name, 0, calories);
+        }
+
+        vegetableRepository.addVegetable(veg);
+        System.out.println("Овоч додано до бази!");
     }
 
     @Override
@@ -150,10 +348,43 @@ class AddVegetableToRepositoryCommand implements ICommand {
 }
 
 class UpdateVegetableCommand implements ICommand {
+    private VegetableRepository vegetableRepository;
+    private Scanner scanner;
+
+    public UpdateVegetableCommand(VegetableRepository vegetableRepository, Scanner scanner) {
+        this.vegetableRepository = vegetableRepository;
+        this.scanner = scanner;
+    }
 
     @Override
     public void execute() {
-        System.out.println("\n Реалізувати updateVegetable()");
+        System.out.print("\nВведіть ID овоча для оновлення: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        Vegetable existing = vegetableRepository.getVegetableById(id);
+        if (existing == null) {
+            System.out.println("Овоч не знайдено!");
+            return;
+        }
+
+        System.out.print("Введіть нову назву овоча: ");
+        String name = scanner.nextLine();
+        System.out.print("Введіть нові калорії на 100г: ");
+        double calories = scanner.nextDouble();
+        scanner.nextLine();
+
+        Vegetable updated;
+        if (existing instanceof FruitVegetable) {
+            updated = new FruitVegetable(id, name, 0, calories);
+        } else if (existing instanceof RootVegetable) {
+            updated = new RootVegetable(id, name, 0, calories);
+        } else {
+            updated = new LeafyVegetable(id, name, 0, calories);
+        }
+
+        vegetableRepository.updateVegetable(id, updated);
+        System.out.println("Інформацію про овоч оновлено!");
     }
 
     @Override
@@ -163,10 +394,26 @@ class UpdateVegetableCommand implements ICommand {
 }
 
 class DeleteVegetableCommand implements ICommand {
+    private VegetableRepository vegetableRepository;
+    private Scanner scanner;
+
+    public DeleteVegetableCommand(VegetableRepository vegetableRepository, Scanner scanner) {
+        this.vegetableRepository = vegetableRepository;
+        this.scanner = scanner;
+    }
 
     @Override
     public void execute() {
-        System.out.println("\nРеалізувати deleteVegetable()");
+        System.out.print("\nВведіть ID овоча для видалення: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        boolean removed = vegetableRepository.removeVegetable(id);
+        if (removed) {
+            System.out.println("Овоч видалено з бази!");
+        } else {
+            System.out.println("Овоч не знайдено!");
+        }
     }
 
     @Override
@@ -175,12 +422,22 @@ class DeleteVegetableCommand implements ICommand {
     }
 }
 
-// Команди для роботи з файлами
 class SaveVegetablesToFileCommand implements ICommand {
+    private VegetableRepository vegetableRepository;
+    private FileManager fileManager;
+    private Scanner scanner;
+
+    public SaveVegetablesToFileCommand(VegetableRepository vegetableRepository, FileManager fileManager, Scanner scanner) {
+        this.vegetableRepository = vegetableRepository;
+        this.fileManager = fileManager;
+        this.scanner = scanner;
+    }
 
     @Override
     public void execute() {
-        System.out.println("\nРеалізувати saveVegetablesToFile()");
+        System.out.print("\nВведіть назву файлу: ");
+        String filename = scanner.nextLine();
+        fileManager.saveVegetablesToFile(vegetableRepository.getAllVegetables(), filename);
     }
 
     @Override
@@ -190,10 +447,26 @@ class SaveVegetablesToFileCommand implements ICommand {
 }
 
 class LoadVegetablesFromFileCommand implements ICommand {
+    private VegetableRepository vegetableRepository;
+    private FileManager fileManager;
+    private Scanner scanner;
+
+    public LoadVegetablesFromFileCommand(VegetableRepository vegetableRepository, FileManager fileManager, Scanner scanner) {
+        this.vegetableRepository = vegetableRepository;
+        this.fileManager = fileManager;
+        this.scanner = scanner;
+    }
 
     @Override
     public void execute() {
-        System.out.println("\nРеалізувати loadVegetablesFromFile()");
+        System.out.print("\nВведіть назву файлу: ");
+        String filename = scanner.nextLine();
+        ArrayList<Vegetable> vegetables = fileManager.loadVegetablesFromFile(filename);
+
+        vegetableRepository.clear();
+        for (Vegetable veg : vegetables) {
+            vegetableRepository.addVegetable(veg);
+        }
     }
 
     @Override
@@ -203,10 +476,31 @@ class LoadVegetablesFromFileCommand implements ICommand {
 }
 
 class SaveToFileCommand implements ICommand {
+    private SaladService saladService;
+    private FileManager fileManager;
+    private Scanner scanner;
+
+    public SaveToFileCommand(SaladService saladService, FileManager fileManager, Scanner scanner) {
+        this.saladService = saladService;
+        this.fileManager = fileManager;
+        this.scanner = scanner;
+    }
 
     @Override
     public void execute() {
-        System.out.println("\nРеалізувати saveToFile()");
+        System.out.print("\nВведіть ID салату: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        Salad salad = saladService.getSaladById(id);
+        if (salad == null) {
+            System.out.println("Салат не знайдено!");
+            return;
+        }
+
+        System.out.print("Введіть назву файлу: ");
+        String filename = scanner.nextLine();
+        fileManager.saveSaladToFile(salad, filename);
     }
 
     @Override
@@ -216,11 +510,29 @@ class SaveToFileCommand implements ICommand {
 }
 
 class LoadFromFileCommand implements ICommand {
-    // додати FileManager
+    private SaladService saladService;
+    private FileManager fileManager;
+    private Scanner scanner;
+
+    public LoadFromFileCommand(SaladService saladService, FileManager fileManager, Scanner scanner) {
+        this.saladService = saladService;
+        this.fileManager = fileManager;
+        this.scanner = scanner;
+    }
 
     @Override
     public void execute() {
-        System.out.println("\nРеалізувати loadFromFile()");
+        System.out.print("\nВведіть назву файлу: ");
+        String filename = scanner.nextLine();
+        Salad salad = fileManager.loadSaladFromFile(filename);
+
+        if (salad != null) {
+            saladService.createSalad(salad.getName(), salad.getId());
+            Salad newSalad = saladService.getSaladById(salad.getId());
+            for (Vegetable veg : salad.getVegetables()) {
+                newSalad.addVegetable(veg);
+            }
+        }
     }
 
     @Override
@@ -229,7 +541,6 @@ class LoadFromFileCommand implements ICommand {
     }
 }
 
-// Команда для відкриття підменю
 class OpenSubMenuCommand implements ICommand {
     private SubMenu subMenu;
     private String description;
@@ -250,7 +561,6 @@ class OpenSubMenuCommand implements ICommand {
     }
 }
 
-// Команда виходу
 class ExitCommand implements ICommand {
     @Override
     public void execute() {
@@ -264,7 +574,6 @@ class ExitCommand implements ICommand {
     }
 }
 
-// Підменю
 class SubMenu {
     private String title;
     private Map<Integer, ICommand> commands;
@@ -317,7 +626,6 @@ class SubMenu {
     }
 }
 
-// Головне меню
 class ConsoleMenu {
     private Map<Integer, ICommand> commands;
     private Scanner scanner;
@@ -371,39 +679,38 @@ class ConsoleMenu {
     }
 }
 
-// Головна програма
 public class Main {
     public static void main(String[] args) {
-        // Коли будуть готові SaladService та FileManager
-        // SaladService saladService = new SaladService(...);
-        // FileManager fileManager = new FileManager();
+        Scanner scanner = new Scanner(System.in);
 
-        // Підменю для салатів
+        VegetableRepository vegetableRepository = new VegetableRepository();
+        SaladRepository saladRepository = new SaladRepository();
+
+        SaladService saladService = new SaladService(vegetableRepository, saladRepository);
+        FileManager fileManager = new FileManager();
+
         SubMenu saladMenu = new SubMenu("Робота з салатами");
-        saladMenu.registerCommand(1, new CreateSaladCommand());
-        saladMenu.registerCommand(2, new AddVegetableToSaladCommand());
-        saladMenu.registerCommand(3, new RemoveVegetableFromSaladCommand());
-        saladMenu.registerCommand(4, new DisplaySaladCommand());
-        saladMenu.registerCommand(5, new CalculateCaloriesCommand());
-        saladMenu.registerCommand(6, new SortVegetablesByCaloriesInSaladCommand());
-        saladMenu.registerCommand(7, new SortVegetablesByWeightInSaladCommand());
-        saladMenu.registerCommand(8, new DeleteSaladCommand());
+        saladMenu.registerCommand(1, new CreateSaladCommand(saladService, scanner));
+        saladMenu.registerCommand(2, new AddVegetableToSaladCommand(saladService, vegetableRepository, scanner));
+        saladMenu.registerCommand(3, new RemoveVegetableFromSaladCommand(saladService, scanner));
+        saladMenu.registerCommand(4, new DisplaySaladCommand(saladService, scanner));
+        saladMenu.registerCommand(5, new CalculateCaloriesCommand(saladService, scanner));
+        saladMenu.registerCommand(6, new SortVegetablesByCaloriesInSaladCommand(saladService, scanner));
+        saladMenu.registerCommand(7, new SortVegetablesByWeightInSaladCommand(saladService, scanner));
+        saladMenu.registerCommand(8, new DeleteSaladCommand(saladService, scanner));
 
-        // Підменю для овочів
         SubMenu vegetableMenu = new SubMenu("Робота з овочами");
-        vegetableMenu.registerCommand(1, new DisplayAllVegetablesCommand());
-        vegetableMenu.registerCommand(2, new AddVegetableToRepositoryCommand());
-        vegetableMenu.registerCommand(3, new UpdateVegetableCommand());
-        vegetableMenu.registerCommand(4, new DeleteVegetableCommand());
+        vegetableMenu.registerCommand(1, new DisplayAllVegetablesCommand(vegetableRepository));
+        vegetableMenu.registerCommand(2, new AddVegetableToRepositoryCommand(vegetableRepository, scanner));
+        vegetableMenu.registerCommand(3, new UpdateVegetableCommand(vegetableRepository, scanner));
+        vegetableMenu.registerCommand(4, new DeleteVegetableCommand(vegetableRepository, scanner));
 
-        // Підменю для файлів
         SubMenu fileMenu = new SubMenu("Робота з файлами");
-        fileMenu.registerCommand(1, new SaveToFileCommand());
-        fileMenu.registerCommand(2, new LoadFromFileCommand());
-        fileMenu.registerCommand(3, new SaveVegetablesToFileCommand());
-        fileMenu.registerCommand(4, new LoadVegetablesFromFileCommand());
+        fileMenu.registerCommand(1, new SaveToFileCommand(saladService, fileManager, scanner));
+        fileMenu.registerCommand(2, new LoadFromFileCommand(saladService, fileManager, scanner));
+        fileMenu.registerCommand(3, new SaveVegetablesToFileCommand(vegetableRepository, fileManager, scanner));
+        fileMenu.registerCommand(4, new LoadVegetablesFromFileCommand(vegetableRepository, fileManager, scanner));
 
-        // Головне меню
         ConsoleMenu mainMenu = new ConsoleMenu();
         mainMenu.registerCommand(1, new OpenSubMenuCommand(saladMenu, "Дії з салатами"));
         mainMenu.registerCommand(2, new OpenSubMenuCommand(vegetableMenu, "Дії з овочами"));
