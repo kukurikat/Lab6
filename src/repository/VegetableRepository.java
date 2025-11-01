@@ -1,6 +1,10 @@
 package repository;
 
-import model.*;
+import model.FruitVegetable;
+import model.LeafyVegetable;
+import model.RootVegetable;
+import model.Vegetable;
+
 import java.util.ArrayList;
 
 public class VegetableRepository {

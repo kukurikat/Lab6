@@ -9,6 +9,37 @@ interface   ICommand {
     String getDescription();
 }
 
+class RunTestsCommand implements ICommand {
+
+    @Override
+    public void execute() {
+        System.out.println("\n========================================");
+        System.out.println("       UNIT TESTS EXECUTION");
+        System.out.println("========================================\n");
+
+        test.VegetableTest.main(new String[]{});
+        test.SaladTest.main(new String[]{});
+        test.VegetableRepositoryTest.main(new String[]{});
+        test.SaladRepositoryTest.main(new String[]{});
+        test.SaladServiceTest.main(new String[]{});
+        test.FileManagerTest.main(new String[]{});
+
+        System.out.println("========================================");
+        System.out.println("       ALL TESTS COMPLETED");
+        System.out.println("========================================");
+
+        System.out.println("\nНатисніть Enter для продовження...");
+        try {
+            System.in.read();
+        } catch (Exception e) {}
+    }
+
+    @Override
+    public String getDescription() {
+        return "Запустити всі юніт-тести";
+    }
+}
+
 class CreateSaladCommand implements ICommand {
     private SaladService saladService;
     private Scanner scanner;
@@ -715,6 +746,7 @@ public class Main {
         mainMenu.registerCommand(1, new OpenSubMenuCommand(saladMenu, "Дії з салатами"));
         mainMenu.registerCommand(2, new OpenSubMenuCommand(vegetableMenu, "Дії з овочами"));
         mainMenu.registerCommand(3, new OpenSubMenuCommand(fileMenu, "Дії з файлами"));
+        mainMenu.registerCommand(4, new RunTestsCommand());
         mainMenu.registerCommand(0, new ExitCommand());
 
         mainMenu.run();
