@@ -4,7 +4,7 @@ import service.*;
 import util.*;
 import java.util.*;
 
-interface ICommand {
+interface   ICommand {
     void execute();
     String getDescription();
 }
