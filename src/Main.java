@@ -4,6 +4,7 @@ import service.*;
 import util.*;
 import java.util.*;
 
+
 interface   ICommand {
     void execute();
     String getDescription();
@@ -33,6 +34,22 @@ class CreateSaladCommand implements ICommand {
     @Override
     public String getDescription() {
         return "Створити новий салат";
+    }
+}
+class ShowAllSalads implements ICommand {
+    private SaladRepository salads;
+
+    public ShowAllSalads(SaladRepository salads) {
+        this.salads = salads;
+    }
+    @Override
+    public void execute() {
+       salads.showAllSalads();
+    }
+
+    @Override
+    public String getDescription() {
+        return " Вивести всі салати";
     }
 }
 
@@ -698,6 +715,8 @@ public class Main {
         saladMenu.registerCommand(6, new SortVegetablesByCaloriesInSaladCommand(saladService, scanner));
         saladMenu.registerCommand(7, new SortVegetablesByWeightInSaladCommand(saladService, scanner));
         saladMenu.registerCommand(8, new DeleteSaladCommand(saladService, scanner));
+        saladMenu.registerCommand(9, new ShowAllSalads(saladRepository));
+
 
         SubMenu vegetableMenu = new SubMenu("Робота з овочами");
         vegetableMenu.registerCommand(1, new DisplayAllVegetablesCommand(vegetableRepository));

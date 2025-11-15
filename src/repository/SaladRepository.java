@@ -9,7 +9,11 @@ public class SaladRepository {
     public SaladRepository() {
         this.salads = new ArrayList<>();
     }
-
+    public void showAllSalads(){
+        for(Salad salad : salads){
+            System.out.println(salad);
+        }
+    }
     public void addSalad(Salad salad) {
         salads.add(salad);
     }
