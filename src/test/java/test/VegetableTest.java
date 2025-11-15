@@ -72,7 +72,7 @@ public class VegetableTest {
     }
 
     @Test
-    @DisplayName("Polymorphism works correctly")
+    @DisplayName(" Polymorphism works correctly")
     void testPolymorphism() {
         Vegetable fruit = new FruitVegetable(1, "Помідор", 100, 18);
         Vegetable root = new RootVegetable(2, "Морква", 150, 41);
