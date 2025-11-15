@@ -49,7 +49,7 @@ class ShowAllSalads implements ICommand {
 
     @Override
     public String getDescription() {
-        return " Вивести всі салати";
+        return "Вивести всі салати";
     }
 }
 
